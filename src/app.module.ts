@@ -30,6 +30,7 @@ import { FormatsModule } from './formats/formats.module'
 import { MessagesModule } from './messages/messages.module'
 import { AuthModule } from './auth/auth.module'
 import { GameTypesModule } from './game_types/game_types.module'
+import { UniqueEmailvalidation } from './common/validators'
 
 @Module({
   imports: [
@@ -47,7 +48,7 @@ import { GameTypesModule } from './game_types/game_types.module'
     KnexModule.forRootAsync({
       useFactory: () => ({
         config: {
-          client: 'sqlite3', // or 'better-sqlite3'
+          client: 'sqlite3',
           connection: {
             filename: './data/db.sqlite3',
           },
@@ -80,6 +81,7 @@ import { GameTypesModule } from './game_types/game_types.module'
     VenuesService,
     FormatsService,
     MessagesService,
+    UniqueEmailvalidation,
   ],
 })
 export class AppModule {}

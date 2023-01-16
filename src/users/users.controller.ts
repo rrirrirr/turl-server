@@ -11,6 +11,7 @@ import {
 import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
+import { v4 as uuid } from 'uuid'
 
 @Controller('users')
 export class UsersController {
@@ -18,11 +19,14 @@ export class UsersController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto)
+    return this.usersService.create({
+      ...createUserDto,
+      id: uuid(),
+    })
   }
 
   @Get()
-  findAll(@Query() query: CreateUserDto) {
+  findAll(@Query() query: any) {
     return this.usersService.findAll(query)
   }
 

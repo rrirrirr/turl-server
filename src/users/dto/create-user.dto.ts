@@ -9,7 +9,10 @@ import {
   IsNumberString,
   IsOptional,
   IsString,
+  Validate,
 } from 'class-validator'
+
+import { IsEmailUnique } from 'src/common/validators'
 
 export class CreateUserDto {
   @IsEmpty()
@@ -25,6 +28,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsEmail()
+  @IsEmailUnique()
   email: string
 
   @IsNotEmpty()
