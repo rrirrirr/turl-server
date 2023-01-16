@@ -3,15 +3,16 @@
  * @returns { Promise<void> }
  */
 exports.up = function (knex) {
-  return knex.schema.createTable('invitations', (table) => {
-    table.string('id').primary()
+  return knex.schema.createTable('invites', (table) => {
+    table.uuid('id').primary().notNullable()
     table.string('code').notNullable()
-    table.string('expiration_date')
-    table.string('created_at').notNullable()
+    table.timestamp('expiration_date')
+    table.timestamp('created_at').notNullable()
     table.boolean('unique').notNullable()
-    table.string('name').notNullable()
-    table.string('tournament')
-    table.foreign('tournament').references('tournaments.id')
+    table.boolean('used')
+    table.string('name')
+    table.uuid('tournament_id')
+    table.foreign('tournament_id').references('tournaments.id')
   })
 }
 
@@ -20,5 +21,5 @@ exports.up = function (knex) {
  * @returns { Promise<void> }
  */
 exports.down = function (knex) {
-  return knex.schema.dropTable('invitations')
+  return knex.schema.dropTable('invites')
 }

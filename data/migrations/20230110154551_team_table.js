@@ -4,12 +4,14 @@
  */
 exports.up = function (knex) {
   return knex.schema.createTable('teams', (table) => {
-    table.string('id').primary()
+    table.uuid('id').primary().notNullable()
     table.string('name').notNullable()
-    table.string('created_at').notNullable()
-    // table.date
-    table.string('tournament')
-    table.foreign('tournament').references('id').inTable('tournaments')
+    table.timestamp('created_at').defaultTo(knex.fn.now())
+    table.boolean('accepted').notNullable()
+    table.integer('seed')
+    table.string('team_code').notNullable()
+    table.uuid('tournament_id')
+    table.foreign('tournament_id').references('id').inTable('tournaments')
   })
 }
 
