@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { InjectConnection } from 'nest-knexjs'
 import { Knex } from 'knex'
+import { v4 as uuid } from 'uuid'
 
 //////FIXXXXX!!!!
 export type User = any
@@ -11,22 +12,21 @@ export type User = any
 export class UsersService {
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async findAll(queries: CreateUserDto) {
-    const tournaments = await this.knex.table('users').where(queries)
-    return tournaments
+  async findAll(queries: any) {
+    const users = await this.knex.table('users').where(queries)
+    return users
   }
 
   async create(createUserDto: CreateUserDto) {
-    const result = await this.knex.table('users').insert(createUserDto, ['id'])
+    const result = await this.knex
+      .table('users')
+      .insert({ ...createUserDto, id: uuid() }, ['id'])
     return result
   }
 
   async findOne(email: string): Promise<User | undefined> {
-    const tournament = await this.knex
-      .table('users')
-      .select()
-      .where({ email: email })
-    return tournament
+    const user = await this.knex.table('users').select().where({ email: email })
+    return user[0]
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
