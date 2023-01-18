@@ -7,6 +7,7 @@ exports.up = function (knex) {
     table.uuid('id').primary().notNullable()
     table.text('text').notNullable()
     table.timestamp('created_at').defaultTo(knex.fn.now())
+    table.timestamp('time')
   })
 }
 

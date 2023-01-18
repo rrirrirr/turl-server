@@ -6,6 +6,7 @@ exports.up = function (knex) {
   return knex.schema.createTable('game_types', (table) => {
     table.string('name').primary()
     table.boolean('enabled').notNullable()
+    table.text('description')
   })
 }
 
