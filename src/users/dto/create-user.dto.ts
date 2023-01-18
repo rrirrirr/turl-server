@@ -27,6 +27,10 @@ export class CreateUserDto {
   last_name: string
 
   @IsNotEmpty()
+  @IsBoolean()
+  isAdmin: boolean
+
+  @IsNotEmpty()
   @IsEmail()
   @IsEmailUnique()
   email: string
