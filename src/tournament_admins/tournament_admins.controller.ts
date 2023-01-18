@@ -38,11 +38,11 @@ export class TournamentAdminsController {
     @Param('id') id: string,
     @Body() updateTournamentAdminDto: UpdateTournamentAdminDto
   ) {
-    return this.tournamentAdminsService.update(+id, updateTournamentAdminDto)
+    return this.tournamentAdminsService.update(id, updateTournamentAdminDto)
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.tournamentAdminsService.remove(+id)
+    return this.tournamentAdminsService.remove(id)
   }
 }

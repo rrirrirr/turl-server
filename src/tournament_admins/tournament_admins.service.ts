@@ -9,11 +9,11 @@ import { TournamentAdmin } from './entities/tournament_admin.entity'
 export class TournamentAdminsService {
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async findAll(queries: any) {
-    const tournament_admins = await this.knex
+  async findAll(queries: any): Promise<TournamentAdmin[] | undefined> {
+    const tournamentAdmins = await this.knex
       .table('tournament_admins')
       .where(queries)
-    return { tournament_admins }
+    return tournamentAdmins
   }
 
   async create(createTournamentAdminDto: CreateTournamentAdminDto) {
@@ -23,12 +23,12 @@ export class TournamentAdminsService {
     return result
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<TournamentAdmin | undefined> {
     const tournamentAdmin = await this.knex
       .table('tournament_admins')
       .select()
       .where({ id: id })
-    return tournamentAdmin
+    return tournamentAdmin[0]
   }
 
   async findByTournamentId(id: string): Promise<TournamentAdmin[]> {
@@ -39,7 +39,7 @@ export class TournamentAdminsService {
     return tournamentAdmins
   }
 
-  async findByUserId(id: string) {
+  async findByUserId(id: string): Promise<TournamentAdmin[] | undefined> {
     const tournamentAdmins = await this.knex
       .table('tournament_admins')
       .select()
@@ -47,11 +47,11 @@ export class TournamentAdminsService {
     return tournamentAdmins
   }
 
-  update(id: number, updateTournamentAdminDto: UpdateTournamentAdminDto) {
+  update(id: string, updateTournamentAdminDto: UpdateTournamentAdminDto) {
     return `This action updates a #${id} tournamentAdmin`
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const res = await this.knex
       .table('tournament_admins')
       .where({ id: id })
