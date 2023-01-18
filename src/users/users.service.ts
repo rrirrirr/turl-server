@@ -1,12 +1,11 @@
-import { Injectable } from '@nestjs/common'
+import { ForbiddenException, Injectable } from '@nestjs/common'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { InjectConnection } from 'nest-knexjs'
 import { Knex } from 'knex'
 import { v4 as uuid } from 'uuid'
-
-//////FIXXXXX!!!!
-export type User = any
+import { User } from './entities/user.entity'
+import { AuthUser } from 'src/auth/authUser.entity'
 
 @Injectable()
 export class UsersService {
@@ -29,11 +28,25 @@ export class UsersService {
     return user[0]
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} team`
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+    currentUser: AuthUser
+  ) {
+    const permission = currentUser.userId === id
+
+    if (!permission && !currentUser.isAdmin) {
+      throw new ForbiddenException('No permission')
+    }
+
+    const user = await this.knex
+      .table('users')
+      .where({ id: id })
+      .update(updateUserDto, ['id'])
+    return user
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const res = await this.knex.table('users').where({ id: id }).del()
     return res
   }
