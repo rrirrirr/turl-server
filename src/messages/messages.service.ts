@@ -13,14 +13,14 @@ export class MessagesService {
     return messages
   }
 
-  async create(createInviteDto: CreateMessageDto) {
+  async create(CreateMessageDto: CreateMessageDto) {
     const result = await this.knex
       .table('messages')
-      .insert(createInviteDto, ['id'])
+      .insert(CreateMessageDto, ['id'])
     return result
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const tournament = await this.knex
       .table('messages')
       .select()
@@ -28,11 +28,15 @@ export class MessagesService {
     return tournament
   }
 
-  async update(id: number, updateInviteDto: UpdateMessageDto) {
-    return `This action updates a #${id} messages`
+  async update(id: string, updateInviteDto: UpdateMessageDto) {
+    const tournament = await this.knex
+      .table('messages')
+      .where({ id: id })
+      .update(UpdateMessageDto, ['id'])
+    return tournament
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const res = await this.knex.table('messages').where({ id: id }).del()
     return res
   }

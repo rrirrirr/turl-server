@@ -3,12 +3,13 @@ import { CreateVenueDto } from './dto/create-venue.dto'
 import { UpdateVenueDto } from './dto/update-venue.dto'
 import { InjectConnection } from 'nest-knexjs'
 import { Knex } from 'knex'
+import { Venue } from './entities/venue.entity'
 
 @Injectable()
 export class VenuesService {
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async findAll() {
+  async findAll(): Promise<Venue[] | undefined> {
     const venues = await this.knex.table('venues')
     return venues
   }
@@ -20,16 +21,17 @@ export class VenuesService {
     return result
   }
 
-  async findOne(name: string) {
-    const tournament = await this.knex
-      .table('venues')
-      .select()
-      .where({ name: name })
-    return tournament
+  async findOne(name: string): Promise<Venue | undefined> {
+    const venue = await this.knex.table('venues').select().where({ name: name })
+    return venue[0]
   }
 
   async update(name: string, updateInviteDto: UpdateVenueDto) {
-    return `This action updates a #${name} invite`
+    const venue = await this.knex
+      .table('venues')
+      .where({ name: name })
+      .update(UpdateVenueDto, ['name'])
+    return venue
   }
 
   async remove(name: string) {

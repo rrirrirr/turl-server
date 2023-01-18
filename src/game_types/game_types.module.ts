@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
-import { GameTypesService } from './game_types.service';
-import { GameTypesController } from './game_types.controller';
+import { Module } from '@nestjs/common'
+import { GameTypesService } from './game_types.service'
+import { GameTypesController } from './game_types.controller'
+import { CaslAbilityFactory } from 'src/abilities/casl-ability.factory/casl-ability.factory'
 
 @Module({
   controllers: [GameTypesController],
-  providers: [GameTypesService]
+  providers: [GameTypesService, CaslAbilityFactory],
 })
 export class GameTypesModule {}

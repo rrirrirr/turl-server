@@ -3,12 +3,13 @@ import { CreateGameTypeDto } from './dto/create-game_type.dto'
 import { UpdateGameTypeDto } from './dto/update-game_type.dto'
 import { InjectConnection } from 'nest-knexjs'
 import { Knex } from 'knex'
+import { GameType } from './entities/game_type.entity'
 
 @Injectable()
 export class GameTypesService {
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async findAll() {
+  async findAll(): Promise<GameType[] | undefined> {
     const game_types = await this.knex.table('game_types')
     return game_types
   }
@@ -20,16 +21,20 @@ export class GameTypesService {
     return result
   }
 
-  async findOne(name: string) {
-    const tournament = await this.knex
+  async findOne(name: string): Promise<GameType | undefined> {
+    const gameType = await this.knex
       .table('game_types')
       .select()
       .where({ name: name })
-    return tournament
+    return gameType[0]
   }
 
-  async update(name: string, updateInviteDto: UpdateGameTypeDto) {
-    return `This action updates a #${name} invite`
+  async update(name: string, updateGameTypeDto: UpdateGameTypeDto) {
+    const gameType = await this.knex
+      .table('game_types')
+      .where({ name: name })
+      .update(updateGameTypeDto, ['name'])
+    return gameType
   }
 
   async remove(name: string) {
