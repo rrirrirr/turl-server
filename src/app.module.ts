@@ -31,6 +31,10 @@ import { MessagesModule } from './messages/messages.module'
 import { AuthModule } from './auth/auth.module'
 import { GameTypesModule } from './game_types/game_types.module'
 import { UniqueEmailvalidation } from './common/validators'
+import { TournamentAdminsModule } from './tournament_admins/tournament_admins.module'
+import { TournamentAdminsController } from './tournament_admins/tournament_admins.controller'
+import { TournamentAdminsService } from './tournament_admins/tournament_admins.service'
+import { CaslModule } from './abilities/casl.module'
 
 @Module({
   imports: [
@@ -43,6 +47,7 @@ import { UniqueEmailvalidation } from './common/validators'
     VenuesModule,
     FormatsModule,
     MessagesModule,
+    CaslModule,
 
     // KnexModule.forRoot({
     KnexModule.forRootAsync({
@@ -57,6 +62,7 @@ import { UniqueEmailvalidation } from './common/validators'
     }),
 
     AuthModule,
+    TournamentAdminsModule,
   ],
   controllers: [
     AppController,
@@ -69,6 +75,7 @@ import { UniqueEmailvalidation } from './common/validators'
     VenuesController,
     FormatsController,
     MessagesController,
+    TournamentAdminsController,
   ],
   providers: [
     AppService,
@@ -81,6 +88,7 @@ import { UniqueEmailvalidation } from './common/validators'
     VenuesService,
     FormatsService,
     MessagesService,
+    TournamentAdminsService,
     UniqueEmailvalidation,
   ],
 })
