@@ -26,7 +26,7 @@ export class UniqueEmailvalidation implements ValidatorConstraintInterface {
   constructor(@InjectConnection() private readonly knex: Knex) {}
   async validate(email: string): Promise<boolean> {
     const user = await this.knex.table('users').select().where({ email: email })
-    if (user) {
+    if (user.length) {
       throw new UnprocessableEntityException('Email already exists')
     } else {
       return true
