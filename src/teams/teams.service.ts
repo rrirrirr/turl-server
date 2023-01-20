@@ -1,39 +1,56 @@
-import { Injectable } from '@nestjs/common'
+import { wrap } from '@mikro-orm/core'
+import { InjectRepository } from '@mikro-orm/nestjs'
+import { EntityRepository } from '@mikro-orm/sqlite'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { CreateTeamDto } from './dto/create-team.dto'
 import { UpdateTeamDto } from './dto/update-team.dto'
-import { InjectConnection } from 'nest-knexjs'
-import { Knex } from 'knex'
 import { Team } from './entities/team.entity'
 
 @Injectable()
 export class TeamsService {
-  constructor(@InjectConnection() private readonly knex: Knex) {}
+  constructor(
+    @InjectRepository(Team)
+    private readonly teamRepository: EntityRepository<Team>
+  ) {}
 
-  async findAll(queries: CreateTeamDto): Promise<Team[] | undefined> {
-    const tournaments = await this.knex.table('teams').where(queries)
-    return tournaments
+  async findAll(queries: CreateTeamDto): Promise<Team[]> {
+    const team = await this.teamRepository.findAll()
+    return team
   }
 
   async create(createTeamDto: CreateTeamDto) {
-    const result = await this.knex.table('teams').insert(createTeamDto, ['id'])
-    return result
+    const team = new Team()
+    wrap(team).assign(createTeamDto)
+    await this.teamRepository.persistAndFlush(team)
+    return team
   }
 
-  async findOne(id: string): Promise<Team | undefined> {
-    const team = await this.knex.table('teams').select().where({ id: id })
-    return team[0]
+  async findOne(id: string): Promise<Team> {
+    const team = await this.teamRepository.findOne({ id: id })
+    return team
   }
 
   async update(id: string, updateTeamDto: UpdateTeamDto) {
-    const team = await this.knex
-      .table('teams')
-      .where({ id: id })
-      .update(updateTeamDto, ['id'])
+    const team = await this.teamRepository.findOne({ id: id })
+
+    if (!team) {
+      throw new HttpException('Team not found', HttpStatus.NOT_FOUND)
+    }
+
+    wrap(team).assign(updateTeamDto)
+    await this.teamRepository.persistAndFlush(team)
+
     return team
   }
 
   async remove(id: string) {
-    const res = await this.knex.table('teams').where({ id: id }).del()
+    const team = await this.teamRepository.findOne({ id: id })
+
+    if (!team) {
+      throw new HttpException('Team not found', HttpStatus.NOT_FOUND)
+    }
+
+    const res = this.teamRepository.removeAndFlush(team)
     return res
   }
 }

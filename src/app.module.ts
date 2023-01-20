@@ -35,6 +35,17 @@ import { TournamentAdminsModule } from './tournament_admins/tournament_admins.mo
 import { TournamentAdminsController } from './tournament_admins/tournament_admins.controller'
 import { TournamentAdminsService } from './tournament_admins/tournament_admins.service'
 import { CaslModule } from './abilities/casl.module'
+import { MikroOrmModule } from '@mikro-orm/nestjs'
+import { Tournament } from './tournaments/entities/tournament.entity'
+import { User } from './users/entities/user.entity'
+import { Invite } from './invites/entities/invite.entity'
+import { GameType } from './game_types/entities/game_type.entity'
+import { Format } from './formats/entities/format.entity'
+import { Team } from './teams/entities/team.entity'
+import { Venue } from './venues/entities/venue.entity'
+import { Message } from './messages/entities/message.entity'
+import { TournamentAdmin } from './tournament_admins/entities/tournament_admin.entity'
+import { Game } from './games/entities/game.entity'
 
 @Module({
   imports: [
@@ -48,22 +59,33 @@ import { CaslModule } from './abilities/casl.module'
     FormatsModule,
     MessagesModule,
     CaslModule,
-
-    // KnexModule.forRoot({
-    KnexModule.forRootAsync({
-      useFactory: () => ({
-        config: {
-          client: 'sqlite3',
-          connection: {
-            filename: './data/db.sqlite3',
-          },
-        },
-      }),
-    }),
-
     AuthModule,
     TournamentAdminsModule,
+
+    MikroOrmModule.forRoot({
+      entities: ['./dist/entities'],
+      entitiesTs: ['./src/entities'],
+      autoLoadEntities: true,
+      dbName: 'db.sqlite3',
+      type: 'sqlite',
+    }),
+
+    MikroOrmModule.forFeature({
+      entities: [
+        Tournament,
+        User,
+        Invite,
+        GameType,
+        Format,
+        Team,
+        Venue,
+        Message,
+        TournamentAdmin,
+        Game,
+      ],
+    }),
   ],
+
   controllers: [
     AppController,
     TournamentsController,

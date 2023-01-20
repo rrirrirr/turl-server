@@ -1,43 +1,56 @@
-import { Injectable } from '@nestjs/common'
+import { wrap } from '@mikro-orm/core'
+import { InjectRepository } from '@mikro-orm/nestjs'
+import { EntityRepository } from '@mikro-orm/sqlite'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { CreateMessageDto } from './dto/create-message.dto'
 import { UpdateMessageDto } from './dto/update-message.dto'
-import { InjectConnection } from 'nest-knexjs'
-import { Knex } from 'knex'
+import { Message } from './entities/message.entity'
 
 @Injectable()
 export class MessagesService {
-  constructor(@InjectConnection() private readonly knex: Knex) {}
+  constructor(
+    @InjectRepository(Message)
+    private readonly messageRepository: EntityRepository<Message>
+  ) {}
 
   async findAll(queries: CreateMessageDto) {
-    const messages = await this.knex.table('messages').where(queries)
-    return messages
+    const message = await this.messageRepository.findAll()
+    return message
   }
 
-  async create(CreateMessageDto: CreateMessageDto) {
-    const result = await this.knex
-      .table('messages')
-      .insert(CreateMessageDto, ['id'])
-    return result
+  async create(createMessageDto: CreateMessageDto) {
+    const message = new Message()
+    wrap(message).assign(createMessageDto)
+    await this.messageRepository.persistAndFlush(message)
+    return message
   }
 
   async findOne(id: string) {
-    const tournament = await this.knex
-      .table('messages')
-      .select()
-      .where({ id: id })
-    return tournament
+    const message = await this.messageRepository.findOne({ id: id })
+    return message
   }
 
-  async update(id: string, updateInviteDto: UpdateMessageDto) {
-    const tournament = await this.knex
-      .table('messages')
-      .where({ id: id })
-      .update(UpdateMessageDto, ['id'])
-    return tournament
+  async update(id: string, updateMessageDto: UpdateMessageDto) {
+    const message = await this.messageRepository.findOne({ id: id })
+
+    if (!message) {
+      throw new HttpException('Game type not found', HttpStatus.NOT_FOUND)
+    }
+
+    wrap(message).assign(updateMessageDto)
+    await this.messageRepository.persistAndFlush(message)
+
+    return message
   }
 
   async remove(id: string) {
-    const res = await this.knex.table('messages').where({ id: id }).del()
+    const message = await this.messageRepository.findOne({ id: id })
+
+    if (!message) {
+      throw new HttpException('Game type not found', HttpStatus.NOT_FOUND)
+    }
+
+    const res = this.messageRepository.removeAndFlush(message)
     return res
   }
 }

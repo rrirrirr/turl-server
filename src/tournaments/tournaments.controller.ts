@@ -50,7 +50,7 @@ export class TournamentsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.tournamentsService.findOne(+id)
+    return this.tournamentsService.findOne(id)
   }
 
   @UseGuards(JwtAuthGuard)

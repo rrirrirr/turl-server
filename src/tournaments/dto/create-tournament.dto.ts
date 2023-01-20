@@ -28,11 +28,11 @@ export class CreateTournamentDto {
 
   @IsOptional()
   @IsDateString()
-  end_date: string
+  end_date: Date
 
   @IsOptional()
   @IsDateString()
-  start_date: string
+  start_date: Date
 
   @IsNotEmpty()
   @IsBoolean()

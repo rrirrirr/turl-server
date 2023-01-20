@@ -1,50 +1,40 @@
-import { Injectable } from '@nestjs/common'
-import { Knex } from 'knex'
-import { InjectConnection } from 'nest-knexjs'
+import { wrap } from '@mikro-orm/core'
+import { InjectRepository } from '@mikro-orm/nestjs'
+import { EntityRepository } from '@mikro-orm/sqlite'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { CreateTournamentAdminDto } from './dto/create-tournament_admin.dto'
 import { UpdateTournamentAdminDto } from './dto/update-tournament_admin.dto'
 import { TournamentAdmin } from './entities/tournament_admin.entity'
 
 @Injectable()
 export class TournamentAdminsService {
-  constructor(@InjectConnection() private readonly knex: Knex) {}
+  constructor(
+    @InjectRepository(TournamentAdmin)
+    private readonly tournamentAdminRepository: EntityRepository<TournamentAdmin>
+  ) {}
 
-  async findAll(queries: any): Promise<TournamentAdmin[] | undefined> {
-    const tournamentAdmins = await this.knex
-      .table('tournament_admins')
-      .where(queries)
-    return tournamentAdmins
+  async findAll(queries: any): Promise<TournamentAdmin[]> {
+    const tournamentAdmin = await this.tournamentAdminRepository.findAll()
+    return tournamentAdmin
   }
 
   async create(createTournamentAdminDto: CreateTournamentAdminDto) {
-    const result = await this.knex
-      .table('tournament_admins')
-      .insert(createTournamentAdminDto, ['id'])
-    return result
+    const tournamentAdmin = new TournamentAdmin()
+    wrap(tournamentAdmin).assign(createTournamentAdminDto)
+    await this.tournamentAdminRepository.persistAndFlush(tournamentAdmin)
+    return tournamentAdmin
   }
 
-  async findOne(id: string): Promise<TournamentAdmin | undefined> {
-    const tournamentAdmin = await this.knex
-      .table('tournament_admins')
-      .select()
-      .where({ id: id })
-    return tournamentAdmin[0]
+  async findOne(id: string): Promise<TournamentAdmin> {
+    return this.tournamentAdminRepository.findOne({ id: id })
   }
 
   async findByTournamentId(id: string): Promise<TournamentAdmin[]> {
-    const tournamentAdmins = await this.knex
-      .table('tournament_admins')
-      .select()
-      .where({ tournament_id: id })
-    return tournamentAdmins
+    return this.tournamentAdminRepository.find({ tournament_id: id })
   }
 
-  async findByUserId(id: string): Promise<TournamentAdmin[] | undefined> {
-    const tournamentAdmins = await this.knex
-      .table('tournament_admins')
-      .select()
-      .where({ user_id: id })
-    return tournamentAdmins
+  async findByUserId(id: string): Promise<TournamentAdmin[]> {
+    return this.tournamentAdminRepository.find({ user_id: id })
   }
 
   update(id: string, updateTournamentAdminDto: UpdateTournamentAdminDto) {
@@ -52,10 +42,13 @@ export class TournamentAdminsService {
   }
 
   async remove(id: string) {
-    const res = await this.knex
-      .table('tournament_admins')
-      .where({ id: id })
-      .del()
+    const user = await this.tournamentAdminRepository.findOne(id)
+
+    if (!user) {
+      throw new HttpException('Admin not found', HttpStatus.NOT_FOUND)
+    }
+
+    const res = this.tournamentAdminRepository.removeAndFlush(user)
     return res
   }
 }

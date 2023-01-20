@@ -1,5 +1,13 @@
+import { Entity, PrimaryKey, Property } from '@mikro-orm/core'
+
+@Entity()
 export class GameType {
-  name: string
-  enabled: boolean
-  description: string
+  @PrimaryKey()
+  name!: string
+
+  @Property()
+  enabled!: boolean
+
+  @Property()
+  description!: string
 }

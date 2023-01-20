@@ -7,9 +7,12 @@ import { PassportModule } from '@nestjs/passport'
 import { JwtModule } from '@nestjs/jwt'
 import { jwtConstants } from './constants'
 import { JwtStrategy } from './jwt.strategy'
+import { User } from 'src/users/entities/user.entity'
+import { MikroOrmModule } from '@mikro-orm/nestjs'
 
 @Module({
   imports: [
+    MikroOrmModule.forFeature({ entities: [User] }),
     UsersModule,
     PassportModule,
     JwtModule.register({

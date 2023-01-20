@@ -1,5 +1,11 @@
+import { Entity, PrimaryKey, Property } from '@mikro-orm/core'
+
+@Entity()
 export class Venue {
-  name: string
-  start_date: string
-  end_date: string
+  @PrimaryKey()
+  name!: string
+  @Property()
+  start_date: Date
+  @Property()
+  end_date: Date
 }

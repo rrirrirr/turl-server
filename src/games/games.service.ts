@@ -1,39 +1,56 @@
-import { Injectable } from '@nestjs/common'
+import { wrap } from '@mikro-orm/core'
+import { InjectRepository } from '@mikro-orm/nestjs'
+import { EntityRepository } from '@mikro-orm/sqlite'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { CreateGameDto } from './dto/create-game.dto'
 import { UpdateGameDto } from './dto/update-game.dto'
-import { InjectConnection } from 'nest-knexjs'
-import { Knex } from 'knex'
 import { Game } from './entities/game.entity'
 
 @Injectable()
 export class GamesService {
-  constructor(@InjectConnection() private readonly knex: Knex) {}
+  constructor(
+    @InjectRepository(Game)
+    private readonly gameRepository: EntityRepository<Game>
+  ) {}
 
-  async findAll(queries: CreateGameDto): Promise<Game[] | undefined> {
-    const games = await this.knex.table('games').where(queries)
-    return games
+  async findAll(queries: CreateGameDto): Promise<Game[]> {
+    const game = await this.gameRepository.findAll()
+    return game
   }
 
-  async create(createTeamDto: CreateGameDto) {
-    const result = await this.knex.table('games').insert(createTeamDto, ['id'])
-    return result
+  async create(createGameDto: CreateGameDto) {
+    const game = new Game()
+    wrap(game).assign(createGameDto)
+    await this.gameRepository.persistAndFlush(game)
+    return game
   }
 
-  async findOne(id: string): Promise<Game | undefined> {
-    const game = await this.knex.table('games').select().where({ id: id })
-    return game[0]
+  async findOne(id: string): Promise<Game> {
+    const game = await this.gameRepository.findOne({ id: id })
+    return game
   }
 
-  async update(id: string, upadateGameDto: UpdateGameDto) {
-    const tournament = await this.knex
-      .table('games')
-      .where({ id: id })
-      .update(upadateGameDto, ['id'])
-    return tournament
+  async update(id: string, updateGameDto: UpdateGameDto) {
+    const game = await this.gameRepository.findOne({ id: id })
+
+    if (!game) {
+      throw new HttpException('Game not found', HttpStatus.NOT_FOUND)
+    }
+
+    wrap(game).assign(updateGameDto)
+    await this.gameRepository.persistAndFlush(game)
+
+    return game
   }
 
   async remove(id: string) {
-    const res = await this.knex.table('games').where({ id: id }).del()
+    const game = await this.gameRepository.findOne({ id: id })
+
+    if (!game) {
+      throw new HttpException('Game not found', HttpStatus.NOT_FOUND)
+    }
+
+    const res = this.gameRepository.removeAndFlush(game)
     return res
   }
 }

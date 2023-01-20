@@ -11,5 +11,5 @@ export class CreateGameTypeDto {
 
   @IsNotEmpty()
   @IsBoolean()
-  enabled: number
+  enabled: boolean
 }

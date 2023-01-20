@@ -1,6 +1,6 @@
+import { InjectRepository } from '@mikro-orm/nestjs'
+import { EntityManager, EntityRepository, MikroORM } from '@mikro-orm/sqlite'
 import { Injectable, UnprocessableEntityException } from '@nestjs/common'
-import { InjectConnection } from 'nest-knexjs'
-import { Knex } from 'knex'
 
 import {
   registerDecorator,
@@ -8,6 +8,7 @@ import {
   ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator'
+import { User } from 'src/users/entities/user.entity'
 
 export function IsEmailUnique(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
@@ -23,10 +24,14 @@ export function IsEmailUnique(validationOptions?: ValidationOptions) {
 @ValidatorConstraint({ name: 'email', async: true })
 @Injectable()
 export class UniqueEmailvalidation implements ValidatorConstraintInterface {
-  constructor(@InjectConnection() private readonly knex: Knex) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: EntityRepository<User>
+  ) {}
   async validate(email: string): Promise<boolean> {
-    const user = await this.knex.table('users').select().where({ email: email })
-    if (user.length) {
+    const user = await this.userRepository.findOne({ email: email })
+
+    if (user) {
       throw new UnprocessableEntityException('Email already exists')
     } else {
       return true

@@ -1,41 +1,56 @@
-import { Injectable } from '@nestjs/common'
+import { wrap } from '@mikro-orm/core'
+import { InjectRepository } from '@mikro-orm/nestjs'
+import { EntityRepository } from '@mikro-orm/sqlite'
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
 import { CreateVenueDto } from './dto/create-venue.dto'
 import { UpdateVenueDto } from './dto/update-venue.dto'
-import { InjectConnection } from 'nest-knexjs'
-import { Knex } from 'knex'
 import { Venue } from './entities/venue.entity'
 
 @Injectable()
 export class VenuesService {
-  constructor(@InjectConnection() private readonly knex: Knex) {}
+  constructor(
+    @InjectRepository(Venue)
+    private readonly venueRepository: EntityRepository<Venue>
+  ) {}
 
   async findAll(): Promise<Venue[] | undefined> {
-    const venues = await this.knex.table('venues')
-    return venues
+    const venue = await this.venueRepository.findAll()
+    return venue
   }
 
-  async create(createInviteDto: CreateVenueDto) {
-    const result = await this.knex
-      .table('venues')
-      .insert(CreateVenueDto, ['name'])
-    return result
+  async create(createVenueDto: CreateVenueDto) {
+    const venue = new Venue()
+    wrap(venue).assign(createVenueDto)
+    await this.venueRepository.persistAndFlush(venue)
+    return venue
   }
 
-  async findOne(name: string): Promise<Venue | undefined> {
-    const venue = await this.knex.table('venues').select().where({ name: name })
-    return venue[0]
+  async findOne(name: string): Promise<Venue> {
+    const venue = await this.venueRepository.findOne({ name: name })
+    return venue
   }
 
-  async update(name: string, updateInviteDto: UpdateVenueDto) {
-    const venue = await this.knex
-      .table('venues')
-      .where({ name: name })
-      .update(UpdateVenueDto, ['name'])
+  async update(name: string, updateVenueDto: UpdateVenueDto) {
+    const venue = await this.venueRepository.findOne({ name: name })
+
+    if (!venue) {
+      throw new HttpException('Venue not found', HttpStatus.NOT_FOUND)
+    }
+
+    wrap(venue).assign(updateVenueDto)
+    await this.venueRepository.persistAndFlush(venue)
+
     return venue
   }
 
   async remove(name: string) {
-    const res = await this.knex.table('venues').where({ name: name }).del()
+    const venue = await this.venueRepository.findOne({ name: name })
+
+    if (!venue) {
+      throw new HttpException('Venue not found', HttpStatus.NOT_FOUND)
+    }
+
+    const res = this.venueRepository.removeAndFlush(venue)
     return res
   }
 }

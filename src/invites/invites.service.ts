@@ -1,23 +1,31 @@
-import { ForbiddenException, Injectable } from '@nestjs/common'
+import {
+  ForbiddenException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common'
 import { CreateInviteDto } from './dto/create-invite.dto'
 import { UpdateInviteDto } from './dto/update-invite.dto'
 import { InjectConnection } from 'nest-knexjs'
-import { Knex } from 'knex'
 import { AuthUser } from 'src/auth/authUser.entity'
 import { TournamentAdminsService } from 'src/tournament_admins/tournament_admins.service'
 import { TournamentAdmin } from 'src/tournament_admins/entities/tournament_admin.entity'
 import { Invite } from './entities/invite.entity'
+import { InjectRepository } from '@mikro-orm/nestjs'
+import { EntityRepository } from '@mikro-orm/sqlite'
+import { wrap } from '@mikro-orm/core'
 
 @Injectable()
 export class InvitesService {
   constructor(
-    @InjectConnection() private readonly knex: Knex,
+    @InjectRepository(Invite)
+    private readonly inviteRepository: EntityRepository<Invite>,
     private readonly tournamentAdminsService: TournamentAdminsService
   ) {}
 
-  async findAll(queries: CreateInviteDto): Promise<Invite[] | undefined> {
-    const invites = await this.knex.table('invites').where(queries)
-    return invites
+  async findAll(queries: CreateInviteDto): Promise<Invite[]> {
+    const invite = await this.inviteRepository.findAll()
+    return invite
   }
 
   async create(createInviteDto: CreateInviteDto, user: AuthUser) {
@@ -27,54 +35,59 @@ export class InvitesService {
       throw new ForbiddenException('No permission')
     }
 
-    const result = await this.knex
-      .table('invites')
-      .insert(createInviteDto, ['id'])
-    return result
+    const invite = new Invite()
+    wrap(invite).assign(createInviteDto)
+    await this.inviteRepository.persistAndFlush(invite)
+    return invite
   }
 
-  async findOne(id: string): Promise<Invite | undefined> {
-    const invite = await this.knex.table('invites').select().where({ id: id })
-    return invite[0]
+  async findOne(id: string): Promise<Invite> {
+    const invite = await this.inviteRepository.findOne({ id: id })
+    return invite
   }
 
   async update(id: string, updateInviteDto: UpdateInviteDto, user: AuthUser) {
-    const permission = this.getPermission(id, user)
+    const invite = await this.inviteRepository.findOne({ id: id })
+
+    if (!invite) {
+      throw new HttpException('Invite not found', HttpStatus.NOT_FOUND)
+    }
+
+    const permission = this.getPermission(invite.tournament_id, user)
 
     if (!permission && !user.isAdmin) {
       throw new ForbiddenException('No permission')
     }
 
-    const invite = await this.knex
-      .table('invites')
-      .where({ id: id })
-      .update(updateInviteDto, ['id'])
+    wrap(invite).assign(updateInviteDto)
+    await this.inviteRepository.persistAndFlush(invite)
+
     return invite
   }
 
   async remove(id: string, user: AuthUser) {
-    const permission = this.getPermission(id, user)
+    const invite = await this.inviteRepository.findOne({ id: id })
+
+    if (!invite) {
+      throw new HttpException('Invite not found', HttpStatus.NOT_FOUND)
+    }
+
+    const permission = this.getPermission(invite.tournament_id, user)
 
     if (!permission && !user.isAdmin) {
       throw new ForbiddenException('No permission')
     }
 
-    const res = await this.knex.table('invites').where({ id: id }).del()
+    const res = this.inviteRepository.removeAndFlush(invite)
     return res
   }
 
   private async getPermission(
-    inviteId: string,
+    tournamentId: string,
     user: AuthUser
-  ): Promise<TournamentAdmin | undefined> {
-    const tournament: { id: string } | undefined = await this.knex('invites')
-      .join('tournaments', 'tournament.id', 'invites.tournament_id')
-      .where({ id: inviteId })
-      .select('tournament.id')
-
-    console.log(tournament)
+  ): Promise<TournamentAdmin | null> {
     const adminRights = await this.tournamentAdminsService.findByTournamentId(
-      tournament.id
+      tournamentId
     )
     const permission = adminRights.find(
       (right) => right.user_id === user.userId
