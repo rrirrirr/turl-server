@@ -13,30 +13,32 @@ import { TournamentAdmin } from 'src/tournament_admins/entities/tournament_admin
 import { Invite } from './entities/invite.entity'
 import { InjectRepository } from '@mikro-orm/nestjs'
 import { EntityRepository } from '@mikro-orm/sqlite'
-import { wrap } from '@mikro-orm/core'
+import { wrap, MikroORM } from '@mikro-orm/core'
 
 @Injectable()
 export class InvitesService {
   constructor(
     @InjectRepository(Invite)
     private readonly inviteRepository: EntityRepository<Invite>,
+    private readonly orm: MikroORM,
     private readonly tournamentAdminsService: TournamentAdminsService
   ) {}
 
   async findAll(queries: CreateInviteDto): Promise<Invite[]> {
-    const invite = await this.inviteRepository.findAll()
+    const invite = await this.inviteRepository.find(queries, {
+      populate: true,
+    })
     return invite
   }
 
   async create(createInviteDto: CreateInviteDto, user: AuthUser) {
-    const permission = this.getPermission(createInviteDto.tournament_id, user)
+    // const permission = this.getPermission(createInviteDto.tournament, user)
 
-    if (!permission && !user.isAdmin) {
-      throw new ForbiddenException('No permission')
-    }
-
+    // if (!permission && !user.isAdmin) {
+    //   throw new ForbiddenException('No permission')
+    // }
     const invite = new Invite()
-    wrap(invite).assign(createInviteDto)
+    wrap(invite).assign(createInviteDto, { em: this.orm.em })
     await this.inviteRepository.persistAndFlush(invite)
     return invite
   }
@@ -53,7 +55,7 @@ export class InvitesService {
       throw new HttpException('Invite not found', HttpStatus.NOT_FOUND)
     }
 
-    const permission = this.getPermission(invite.tournament_id, user)
+    const permission = this.getPermission(invite.tournament, user)
 
     if (!permission && !user.isAdmin) {
       throw new ForbiddenException('No permission')
@@ -72,7 +74,7 @@ export class InvitesService {
       throw new HttpException('Invite not found', HttpStatus.NOT_FOUND)
     }
 
-    const permission = this.getPermission(invite.tournament_id, user)
+    const permission = this.getPermission(invite.tournament, user)
 
     if (!permission && !user.isAdmin) {
       throw new ForbiddenException('No permission')
@@ -89,9 +91,7 @@ export class InvitesService {
     const adminRights = await this.tournamentAdminsService.findByTournamentId(
       tournamentId
     )
-    const permission = adminRights.find(
-      (right) => right.user_id === user.userId
-    )
+    const permission = adminRights.find((right) => right.user === user.userId)
     return permission
   }
 }

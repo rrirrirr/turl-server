@@ -22,15 +22,15 @@ import { Action } from 'src/abilities/action.enum'
 export class GamesController {
   constructor(private readonly gamesService: GamesService) {}
 
-  @UseGuards(JwtAuthGuard, AbilitiesGuard)
-  @CheckAbilities({ action: Action.Create, subject: Game })
+  // @UseGuards(JwtAuthGuard, AbilitiesGuard)
+  // @CheckAbilities({ action: Action.Create, subject: Game })
   @Post()
   create(@Body() createGameDto: CreateGameDto) {
     return this.gamesService.create(createGameDto)
   }
 
   @Get()
-  findAll(@Query() query: CreateGameDto) {
+  findAll(@Query() query: any) {
     return this.gamesService.findAll(query)
   }
 

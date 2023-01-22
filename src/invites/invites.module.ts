@@ -6,10 +6,16 @@ import { CaslAbilityFactory } from 'src/abilities/casl-ability.factory/casl-abil
 import { Invite } from './entities/invite.entity'
 import { MikroOrmModule } from '@mikro-orm/nestjs'
 import { TournamentAdmin } from 'src/tournament_admins/entities/tournament_admin.entity'
+import { SqlEntityRepository } from '@mikro-orm/sqlite'
 
 @Module({
   imports: [MikroOrmModule.forFeature({ entities: [Invite, TournamentAdmin] })],
   controllers: [InvitesController],
-  providers: [InvitesService, CaslAbilityFactory, TournamentAdminsService],
+  providers: [
+    InvitesService,
+    CaslAbilityFactory,
+    TournamentAdminsService,
+    SqlEntityRepository,
+  ],
 })
 export class InvitesModule {}

@@ -1,30 +1,25 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import {
+  IsBoolean,
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator'
 
 export class CreateInviteDto {
-  @IsNotEmpty()
-  id: string
-
   @IsOptional()
   @IsString()
   name: string
 
-  @IsNotEmpty()
-  @IsString()
-  code: string
-
   @IsOptional()
-  @IsString()
+  @IsDateString()
   expiration_date: string
 
   @IsNotEmpty()
-  @IsString()
+  @IsBoolean()
   unique: boolean
 
   @IsNotEmpty()
   @IsString()
-  used: boolean
-
-  @IsNotEmpty()
-  @IsString()
-  tournament_id: string
+  tournament: string
 }

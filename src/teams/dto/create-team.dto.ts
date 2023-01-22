@@ -14,19 +14,18 @@ export class CreateTeamDto {
   @IsString()
   name: string
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   team_code: string
-
-  @IsNotEmpty()
-  @IsString()
-  accepted: boolean
 
   @IsOptional()
   @IsNumber()
   seed: number
 
+  @IsEmpty()
+  accepted: boolean
+
   @IsNotEmpty()
   @IsString()
-  tournament_id: string
+  tournament: string
 }

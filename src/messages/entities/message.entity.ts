@@ -23,10 +23,10 @@ export class MessagesGames {
   id: string = v4()
 
   @ManyToMany(() => Message)
-  message_id!: string
+  message!: string
 
   @ManyToMany(() => Game)
-  game_id!: string
+  game!: string
 }
 
 @Entity()
@@ -35,10 +35,10 @@ export class MessagesTournaments {
   id: string = v4()
 
   @ManyToMany(() => Message)
-  message_id!: string
+  message!: string
 
   @ManyToMany(() => Tournament)
-  tournament_id!: string
+  tournament!: string
 }
 
 @Entity()
@@ -47,10 +47,10 @@ export class MessagesUsers {
   id: string = v4()
 
   @ManyToMany(() => Message)
-  message_id!: string
+  message!: string
 
   @ManyToMany(() => User)
-  user_id!: string
+  user!: string
 }
 
 @Entity()
@@ -59,8 +59,8 @@ export class MessagesTeams {
   id: string = v4()
 
   @ManyToMany(() => Message)
-  message_id!: string
+  message!: string
 
   @ManyToMany(() => Team)
-  team_id!: string
+  team!: string
 }

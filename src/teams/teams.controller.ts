@@ -28,7 +28,7 @@ export class TeamsController {
   }
 
   @Get()
-  findAll(@Query() query: CreateTeamDto) {
+  findAll(@Query() query: any) {
     return this.teamsService.findAll(query)
   }
 
@@ -37,8 +37,8 @@ export class TeamsController {
     return this.teamsService.findOne(id)
   }
 
-  @UseGuards(JwtAuthGuard, AbilitiesGuard)
-  @CheckAbilities({ action: Action.Create, subject: Team })
+  // @UseGuards(JwtAuthGuard, AbilitiesGuard)
+  // @CheckAbilities({ action: Action.Create, subject: Team })
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTeamDto: UpdateTeamDto) {
     return this.teamsService.update(id, updateTeamDto)

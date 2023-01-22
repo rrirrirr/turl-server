@@ -27,6 +27,10 @@ export class CreateTournamentDto {
   max_num_teams: number
 
   @IsOptional()
+  @IsNumber()
+  min_num_players_in_team: number
+
+  @IsOptional()
   @IsDateString()
   end_date: Date
 

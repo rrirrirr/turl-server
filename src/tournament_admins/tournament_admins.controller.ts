@@ -18,31 +18,31 @@ export class TournamentAdminsController {
     private readonly tournamentAdminsService: TournamentAdminsService
   ) {}
 
-  // @Post()
-  // create(@Body() createTournamentAdminDto: CreateTournamentAdminDto) {
-  //   return this.tournamentAdminsService.create(createTournamentAdminDto)
-  // }
+  @Post()
+  create(@Body() createTournamentAdminDto: CreateTournamentAdminDto) {
+    return this.tournamentAdminsService.create(createTournamentAdminDto)
+  }
 
-  // @Get()
-  // findAll(@Query() query: any) {
-  //   return this.tournamentAdminsService.findAll(query)
-  // }
+  @Get()
+  findAll(@Query() query: any) {
+    return this.tournamentAdminsService.findAll(query)
+  }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.tournamentAdminsService.findOne(id)
-  // }
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.tournamentAdminsService.findOne(id)
+  }
 
-  // @Patch(':id')
-  // update(
-  //   @Param('id') id: string,
-  //   @Body() updateTournamentAdminDto: UpdateTournamentAdminDto
-  // ) {
-  //   return this.tournamentAdminsService.update(id, updateTournamentAdminDto)
-  // }
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateTournamentAdminDto: UpdateTournamentAdminDto
+  ) {
+    return this.tournamentAdminsService.update(id, updateTournamentAdminDto)
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.tournamentAdminsService.remove(id)
-  // }
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.tournamentAdminsService.remove(id)
+  }
 }

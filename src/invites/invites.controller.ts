@@ -23,8 +23,8 @@ import { Action } from 'src/abilities/action.enum'
 export class InvitesController {
   constructor(private readonly invitesService: InvitesService) {}
 
-  @UseGuards(JwtAuthGuard, AbilitiesGuard)
-  @CheckAbilities({ action: Action.Create, subject: Invite })
+  // @UseGuards(JwtAuthGuard, AbilitiesGuard)
+  // @CheckAbilities({ action: Action.Create, subject: Invite })
   @Post()
   create(@Body() createInviteDto: CreateInviteDto, @Request() req: any) {
     const user = req.user
@@ -32,10 +32,10 @@ export class InvitesController {
     return this.invitesService.create(createInviteDto, user)
   }
 
-  @UseGuards(JwtAuthGuard, AbilitiesGuard)
-  @CheckAbilities({ action: Action.Read, subject: Invite })
+  // @UseGuards(JwtAuthGuard, AbilitiesGuard)
+  // @CheckAbilities({ action: Action.Read, subject: Invite })
   @Get()
-  findAll(@Query() query: CreateInviteDto) {
+  findAll(@Query() query: any) {
     return this.invitesService.findAll(query)
   }
 

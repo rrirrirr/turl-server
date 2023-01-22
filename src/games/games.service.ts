@@ -1,4 +1,4 @@
-import { wrap } from '@mikro-orm/core'
+import { wrap, MikroORM } from '@mikro-orm/core'
 import { InjectRepository } from '@mikro-orm/nestjs'
 import { EntityRepository } from '@mikro-orm/sqlite'
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
@@ -10,23 +10,30 @@ import { Game } from './entities/game.entity'
 export class GamesService {
   constructor(
     @InjectRepository(Game)
-    private readonly gameRepository: EntityRepository<Game>
+    private readonly gameRepository: EntityRepository<Game>,
+    private readonly orm: MikroORM
   ) {}
 
-  async findAll(queries: CreateGameDto): Promise<Game[]> {
-    const game = await this.gameRepository.findAll()
+  async findAll(queries: any): Promise<Game[]> {
+    const game = await this.gameRepository.find(queries, {
+      populate: ['teams'],
+    })
     return game
   }
 
   async create(createGameDto: CreateGameDto) {
+    console.log(createGameDto)
     const game = new Game()
-    wrap(game).assign(createGameDto)
+    wrap(game).assign(createGameDto, { em: this.orm.em })
     await this.gameRepository.persistAndFlush(game)
     return game
   }
 
   async findOne(id: string): Promise<Game> {
-    const game = await this.gameRepository.findOne({ id: id })
+    const game = await this.gameRepository.findOne(
+      { id: id },
+      { populate: ['tournament', 'teams'] }
+    )
     return game
   }
 

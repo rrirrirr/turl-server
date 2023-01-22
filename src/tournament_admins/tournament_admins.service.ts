@@ -1,4 +1,4 @@
-import { wrap } from '@mikro-orm/core'
+import { wrap, MikroORM } from '@mikro-orm/core'
 import { InjectRepository } from '@mikro-orm/nestjs'
 import { EntityRepository } from '@mikro-orm/sqlite'
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
@@ -10,7 +10,8 @@ import { TournamentAdmin } from './entities/tournament_admin.entity'
 export class TournamentAdminsService {
   constructor(
     @InjectRepository(TournamentAdmin)
-    private readonly tournamentAdminRepository: EntityRepository<TournamentAdmin>
+    private readonly tournamentAdminRepository: EntityRepository<TournamentAdmin>,
+    private readonly orm: MikroORM
   ) {}
 
   async findAll(queries: any): Promise<TournamentAdmin[]> {
@@ -20,7 +21,7 @@ export class TournamentAdminsService {
 
   async create(createTournamentAdminDto: CreateTournamentAdminDto) {
     const tournamentAdmin = new TournamentAdmin()
-    wrap(tournamentAdmin).assign(createTournamentAdminDto)
+    wrap(tournamentAdmin).assign(createTournamentAdminDto, { em: this.orm.em })
     await this.tournamentAdminRepository.persistAndFlush(tournamentAdmin)
     return tournamentAdmin
   }
@@ -30,11 +31,11 @@ export class TournamentAdminsService {
   }
 
   async findByTournamentId(id: string): Promise<TournamentAdmin[]> {
-    return this.tournamentAdminRepository.find({ tournament_id: id })
+    return this.tournamentAdminRepository.find({ tournament: id })
   }
 
   async findByUserId(id: string): Promise<TournamentAdmin[]> {
-    return this.tournamentAdminRepository.find({ user_id: id })
+    return this.tournamentAdminRepository.find({ user: id })
   }
 
   update(id: string, updateTournamentAdminDto: UpdateTournamentAdminDto) {

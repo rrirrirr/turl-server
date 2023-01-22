@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsDateString,
   IsEmpty,
   IsJSON,
@@ -12,10 +13,11 @@ export class CreateGameDto {
   @IsEmpty()
   id: string
 
+  @IsOptional()
   @IsString()
   name: string
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   court: string
 
@@ -27,11 +29,15 @@ export class CreateGameDto {
   @IsDateString()
   start_date: string
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   venue: string
 
+  @IsNotEmpty()
+  @IsArray()
+  teams: string[]
+
   @IsOptional()
   @IsString()
-  tournament_id: string
+  tournament: string
 }

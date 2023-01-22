@@ -1,5 +1,12 @@
 import { v4 } from 'uuid'
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core'
+import {
+  Collection,
+  Entity,
+  OneToMany,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core'
+import { TournamentAdmin } from 'src/tournament_admins/entities/tournament_admin.entity'
 
 @Entity()
 export class User {
@@ -26,6 +33,9 @@ export class User {
 
   @Property()
   created_at: Date = new Date()
+
+  @OneToMany(() => TournamentAdmin, (tournamentAdmin) => tournamentAdmin.user)
+  tournamentAdmin = new Collection<TournamentAdmin>(this)
 
   constructor() {}
 }

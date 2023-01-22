@@ -6,8 +6,6 @@ import {
 } from '@nestjs/common'
 import { CreateTournamentDto } from './dto/create-tournament.dto'
 import { UpdateTournamentDto } from './dto/update-tournament.dto'
-import { InjectConnection } from 'nest-knexjs'
-import { Knex } from 'knex'
 import { Tournament } from './entities/tournament.entity'
 import { TournamentAdminsService } from 'src/tournament_admins/tournament_admins.service'
 import { AuthUser } from 'src/auth/authUser.entity'
@@ -15,18 +13,24 @@ import { v4 as uuid } from 'uuid'
 import { InjectRepository } from '@mikro-orm/nestjs'
 import { MikroORM, wrap } from '@mikro-orm/core'
 import { EntityManager, EntityRepository } from '@mikro-orm/sqlite'
+import { TournamentAdmin } from 'src/tournament_admins/entities/tournament_admin.entity'
 
 @Injectable()
 export class TournamentsService {
   constructor(
     @InjectRepository(Tournament)
+    @InjectRepository(TournamentAdmin)
     private readonly tournamentRepository: EntityRepository<Tournament>,
+    private readonly tournamentAdminRepository: EntityRepository<TournamentAdmin>,
     private readonly orm: MikroORM,
+    private readonly em: EntityManager,
     private readonly tournamentAdminsService: TournamentAdminsService
   ) {}
 
   async findAll(queries: CreateTournamentDto): Promise<Tournament[]> {
-    const tournaments = await this.tournamentRepository.findAll()
+    const tournaments = await this.tournamentRepository.find(queries, {
+      populate: true,
+    })
     return tournaments
   }
 
@@ -39,14 +43,14 @@ export class TournamentsService {
     await this.tournamentRepository.persistAndFlush(tournament)
 
     if (tournament) {
-      const adminDto = {
-        user_id: user.userId,
-        tournament_id: tournament[0].id,
+      const admin = {
+        user: user.userId,
+        tournament: tournament.id,
       }
-      const adminRight = await this.tournamentAdminsService.create({
-        user_id: user.userId,
-        tournament_id: tournament[0].id,
-      })
+
+      const tournamentAdmin = new TournamentAdmin()
+      wrap(tournamentAdmin).assign(admin, { em: this.orm.em })
+      await this.em.persistAndFlush(tournamentAdmin)
     }
     return tournament
   }
@@ -99,9 +103,7 @@ export class TournamentsService {
     const adminRights = await this.tournamentAdminsService.findByTournamentId(
       tournamentId
     )
-    const permission = adminRights.find(
-      (right) => right.user_id === user.userId
-    )
+    const permission = adminRights.find((right) => right.user === user.userId)
     return permission
   }
 }

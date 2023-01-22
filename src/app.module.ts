@@ -46,6 +46,12 @@ import { Venue } from './venues/entities/venue.entity'
 import { Message } from './messages/entities/message.entity'
 import { TournamentAdmin } from './tournament_admins/entities/tournament_admin.entity'
 import { Game } from './games/entities/game.entity'
+import { SqlEntityRepository } from '@mikro-orm/sqlite'
+import { SqliteMikroORM } from '@mikro-orm/sqlite/SqliteMikroORM'
+import { PlayerModule } from './player/player.module'
+import { PlayerController } from './player/player.controller'
+import { PlayerService } from './player/player.service'
+import { Player } from './player/entities/player.entity'
 
 @Module({
   imports: [
@@ -61,6 +67,7 @@ import { Game } from './games/entities/game.entity'
     CaslModule,
     AuthModule,
     TournamentAdminsModule,
+    PlayerModule,
 
     MikroOrmModule.forRoot({
       entities: ['./dist/entities'],
@@ -82,6 +89,7 @@ import { Game } from './games/entities/game.entity'
         Message,
         TournamentAdmin,
         Game,
+        Player,
       ],
     }),
   ],
@@ -98,6 +106,7 @@ import { Game } from './games/entities/game.entity'
     FormatsController,
     MessagesController,
     TournamentAdminsController,
+    PlayerController,
   ],
   providers: [
     AppService,
@@ -111,7 +120,9 @@ import { Game } from './games/entities/game.entity'
     FormatsService,
     MessagesService,
     TournamentAdminsService,
+    PlayerService,
     UniqueEmailvalidation,
+    SqlEntityRepository,
   ],
 })
 export class AppModule {}

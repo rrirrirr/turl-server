@@ -1,4 +1,10 @@
-import { Entity, OneToOne, PrimaryKey, Property } from '@mikro-orm/core'
+import {
+  Entity,
+  ManyToOne,
+  OneToOne,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core'
 import { Tournament } from 'src/tournaments/entities/tournament.entity'
 import { User } from 'src/users/entities/user.entity'
 import { v4 } from 'uuid'
@@ -7,8 +13,12 @@ import { v4 } from 'uuid'
 export class TournamentAdmin {
   @PrimaryKey()
   id: string = v4()
-  @OneToOne(() => User)
-  user_id: string
-  @OneToOne(() => Tournament)
-  tournament_id: string
+
+  @ManyToOne(() => User)
+  user: string
+
+  @ManyToOne(() => Tournament)
+  tournament: string
+
+  constructor() {}
 }
