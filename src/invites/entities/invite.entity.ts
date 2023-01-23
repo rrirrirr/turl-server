@@ -29,7 +29,9 @@ export class Invite {
   name?: string
 
   @ManyToOne(() => Tournament)
-  tournament!: string
+  tournament!: Tournament
+  // @ManyToOne(() => Tournament)
+  // tournament!: string
 
   @Property()
   created_at: Date = new Date()

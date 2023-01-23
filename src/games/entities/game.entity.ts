@@ -9,8 +9,9 @@ import {
 import { Team } from 'src/teams/entities/team.entity'
 import { Tournament } from 'src/tournaments/entities/tournament.entity'
 import { Venue } from 'src/venues/entities/venue.entity'
-export interface Result {}
 import { v4 } from 'uuid'
+
+export interface Result {}
 
 @Entity()
 export class Game {
@@ -25,6 +26,12 @@ export class Game {
 
   @Property({ nullable: true })
   start_date?: Date
+
+  @Property({ nullable: true })
+  end_date?: Date
+
+  @Property({ nullable: true })
+  active: boolean = null
 
   @Property({ nullable: true })
   result?: Result

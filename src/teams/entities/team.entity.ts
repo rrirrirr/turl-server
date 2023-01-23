@@ -11,7 +11,10 @@ import {
 import { Game } from 'src/games/entities/game.entity'
 import { Player } from 'src/player/entities/player.entity'
 import { Tournament } from 'src/tournaments/entities/tournament.entity'
+import { User } from 'src/users/entities/user.entity'
 import { v4 } from 'uuid'
+
+export type Application = 'accepted' | 'declined' | 'waiting'
 
 @Entity()
 export class Team {
@@ -22,7 +25,7 @@ export class Team {
   name!: string
 
   @Property({ nullable: true })
-  accepted: boolean = null
+  accepted: Application = 'waiting'
 
   @Property({ nullable: true })
   seed?: number
@@ -44,4 +47,7 @@ export class Team {
 
   @ManyToMany(() => Game, (game) => game.teams)
   games = new Collection<Game>(this)
+
+  @ManyToMany(() => User, (user) => user.teams)
+  users = new Collection<User>(this)
 }

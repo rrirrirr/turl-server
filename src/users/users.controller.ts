@@ -37,14 +37,14 @@ export class UsersController {
     return this.usersService.findAll(query)
   }
 
-  @UseGuards(JwtAuthGuard, AbilitiesGuard)
-  @CheckAbilities({ action: Action.Read, subject: User })
+  // @UseGuards(JwtAuthGuard, AbilitiesGuard)
+  // @CheckAbilities({ action: Action.Read, subject: User })
   @Get(':email')
   findOne(@Param('email') email: string) {
     return this.usersService.findOne(email)
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(
     @Param('id') id: string,

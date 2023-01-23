@@ -1,10 +1,13 @@
 import {
+  IsArray,
   IsEmpty,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator'
+import { CreatePlayerDto } from 'src/player/dto/create-player.dto'
+import { Application } from '../entities/team.entity'
 
 export class CreateTeamDto {
   @IsEmpty()
@@ -22,8 +25,12 @@ export class CreateTeamDto {
   @IsNumber()
   seed: number
 
+  @IsOptional()
+  @IsArray()
+  player: CreatePlayerDto[]
+
   @IsEmpty()
-  accepted: boolean
+  accepted: Application
 
   @IsNotEmpty()
   @IsString()

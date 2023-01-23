@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  Headers,
 } from '@nestjs/common'
 import { TeamsService } from './teams.service'
 import { CreateTeamDto } from './dto/create-team.dto'
@@ -23,8 +24,11 @@ export class TeamsController {
   constructor(private readonly teamsService: TeamsService) {}
 
   @Post()
-  create(@Body() createTeamDto: CreateTeamDto) {
-    return this.teamsService.create(createTeamDto)
+  create(
+    @Body() createTeamDto: CreateTeamDto,
+    @Headers() headers: Record<string, string>
+  ) {
+    return this.teamsService.create(createTeamDto, headers.invitecode || null)
   }
 
   @Get()

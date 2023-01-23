@@ -63,8 +63,8 @@ export class Tournament {
   @OneToMany(() => Team, (team) => team.tournament)
   teams = new Collection<Team>(this)
 
-  // @OneToMany(() => Game, (game) => game.tournament)
-  // games = new Collection<Game>(this)
+  @OneToMany(() => Game, (game) => game.tournament)
+  games = new Collection<Game>(this)
 
   constructor() {}
 }

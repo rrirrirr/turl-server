@@ -1,5 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types'
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator'
+import { Application } from '../entities/team.entity'
 import { CreateTeamDto } from './create-team.dto'
 
 export class UpdateTeamDto extends PartialType(CreateTeamDto) {
@@ -16,6 +17,6 @@ export class UpdateTeamDto extends PartialType(CreateTeamDto) {
   seed: number
 
   @IsOptional()
-  @IsBoolean()
-  accepted: boolean
+  @IsString()
+  accepted: Application
 }

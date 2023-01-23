@@ -39,8 +39,8 @@ export class GamesController {
     return this.gamesService.findOne(id)
   }
 
-  @UseGuards(JwtAuthGuard, AbilitiesGuard)
-  @CheckAbilities({ action: Action.Update, subject: Game })
+  // @UseGuards(JwtAuthGuard, AbilitiesGuard)
+  // @CheckAbilities({ action: Action.Update, subject: Game })
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto) {
     return this.gamesService.update(id, updateGameDto)

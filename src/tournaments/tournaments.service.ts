@@ -29,7 +29,7 @@ export class TournamentsService {
 
   async findAll(queries: CreateTournamentDto): Promise<Tournament[]> {
     const tournaments = await this.tournamentRepository.find(queries, {
-      populate: true,
+      populate: false,
     })
     return tournaments
   }
@@ -56,7 +56,10 @@ export class TournamentsService {
   }
 
   async findOne(id: string): Promise<Tournament> {
-    const tournament = await this.tournamentRepository.findOne({ id: id })
+    const tournament = await this.tournamentRepository.findOne(
+      { id: id },
+      { populate: ['invites', 'games', 'teams', 'games.teams'] }
+    )
     return tournament
   }
 

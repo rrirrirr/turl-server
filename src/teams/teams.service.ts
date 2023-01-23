@@ -1,7 +1,8 @@
 import { wrap, MikroORM } from '@mikro-orm/core'
 import { InjectRepository } from '@mikro-orm/nestjs'
-import { EntityRepository } from '@mikro-orm/sqlite'
+import { EntityManager, EntityRepository } from '@mikro-orm/sqlite'
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { Invite } from 'src/invites/entities/invite.entity'
 import { CreateTeamDto } from './dto/create-team.dto'
 import { UpdateTeamDto } from './dto/update-team.dto'
 import { Team } from './entities/team.entity'
@@ -11,20 +12,50 @@ export class TeamsService {
   constructor(
     @InjectRepository(Team)
     private readonly teamRepository: EntityRepository<Team>,
+    private readonly em: EntityManager,
     private readonly orm: MikroORM
   ) {}
 
   async findAll(queries: CreateTeamDto): Promise<Team[]> {
     const team = await this.teamRepository.find(queries, {
-      populate: ['tournament', 'player'],
+      populate: ['tournament', 'player', 'games', 'games.teams'],
     })
     return team
   }
 
-  async create(createTeamDto: CreateTeamDto): Promise<Team> {
+  async create(
+    createTeamDto: CreateTeamDto,
+    inviteCode: string | null
+  ): Promise<Team> {
+    const foundInvite = await this.em.findOne(Invite, { code: inviteCode })
+
+    if (!foundInvite) {
+      throw new HttpException('Invite not found', HttpStatus.FORBIDDEN)
+    }
+
+    if (foundInvite.tournament.id !== createTeamDto.tournament) {
+      console.log(foundInvite.tournament.id)
+      console.log(createTeamDto.tournament)
+      throw new HttpException(
+        'Invite not matching tournament',
+        HttpStatus.FORBIDDEN
+      )
+    }
+
+    if (foundInvite.used) {
+      throw new HttpException('Invite already used', HttpStatus.FORBIDDEN)
+    }
+
     const team = new Team()
     wrap(team).assign(createTeamDto, { em: this.orm.em })
     await this.teamRepository.persistAndFlush(team)
+
+    if (foundInvite.unique) {
+      foundInvite.used = true
+      await this.em.upsert(foundInvite)
+      await this.em.flush()
+    }
+
     return team
   }
 

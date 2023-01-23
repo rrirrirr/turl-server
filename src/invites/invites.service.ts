@@ -26,7 +26,7 @@ export class InvitesService {
 
   async findAll(queries: CreateInviteDto): Promise<Invite[]> {
     const invite = await this.inviteRepository.find(queries, {
-      populate: true,
+      populate: ['tournament'],
     })
     return invite
   }
@@ -55,7 +55,7 @@ export class InvitesService {
       throw new HttpException('Invite not found', HttpStatus.NOT_FOUND)
     }
 
-    const permission = this.getPermission(invite.tournament, user)
+    const permission = this.getPermission(invite.tournament.id, user)
 
     if (!permission && !user.isAdmin) {
       throw new ForbiddenException('No permission')
@@ -74,7 +74,7 @@ export class InvitesService {
       throw new HttpException('Invite not found', HttpStatus.NOT_FOUND)
     }
 
-    const permission = this.getPermission(invite.tournament, user)
+    const permission = this.getPermission(invite.tournament.id, user)
 
     if (!permission && !user.isAdmin) {
       throw new ForbiddenException('No permission')
