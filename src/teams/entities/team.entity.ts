@@ -33,7 +33,7 @@ export class Team {
   @Property({ nullable: true })
   team_code: string = v4()
 
-  @Property({ nullable: true })
+  @Property({ hidden: true, nullable: true })
   password?: string
 
   @ManyToOne(() => Tournament)

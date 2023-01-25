@@ -18,6 +18,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { CheckAbilities } from 'src/abilities/abilities.decorator'
 import { Team } from './entities/team.entity'
 import { Action } from 'src/abilities/action.enum'
+import { QueryDto } from 'src/common/query.dto'
 
 @Controller('teams')
 export class TeamsController {
@@ -32,8 +33,10 @@ export class TeamsController {
   }
 
   @Get()
-  findAll(@Query() query: any) {
-    return this.teamsService.findAll(query)
+  findAll(@Query() query: QueryDto) {
+    return query?.team_code
+      ? this.teamsService.findByCode(query.team_code)
+      : this.teamsService.findAll(query)
   }
 
   @Get(':id')

@@ -2,6 +2,7 @@ import { wrap, MikroORM } from '@mikro-orm/core'
 import { InjectRepository } from '@mikro-orm/nestjs'
 import { EntityManager, EntityRepository } from '@mikro-orm/sqlite'
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { QueryDto } from 'src/common/query.dto'
 import { Invite } from 'src/invites/entities/invite.entity'
 import { CreateTeamDto } from './dto/create-team.dto'
 import { UpdateTeamDto } from './dto/update-team.dto'
@@ -16,10 +17,23 @@ export class TeamsService {
     private readonly orm: MikroORM
   ) {}
 
-  async findAll(queries: CreateTeamDto): Promise<Team[]> {
-    const team = await this.teamRepository.find(queries, {
-      populate: ['tournament', 'player', 'games', 'games.teams'],
-    })
+  async findAll(queries: QueryDto): Promise<Team[]> {
+    const team = await this.teamRepository.findAll()
+    return team
+  }
+
+  async findByCode(code: string): Promise<Team> {
+    const team = await this.teamRepository.findOne(
+      { team_code: code },
+      {
+        populate: ['tournament', 'player', 'games', 'games.teams'],
+      }
+    )
+
+    if (!team) {
+      throw new HttpException('Invite not found', HttpStatus.FORBIDDEN)
+    }
+
     return team
   }
 
@@ -60,7 +74,16 @@ export class TeamsService {
   }
 
   async findOne(id: string): Promise<Team> {
-    const team = await this.teamRepository.findOne({ id: id })
+    const team = await this.teamRepository.findOne(
+      { id: id },
+      { populate: ['player'] }
+    )
+
+    if (!team) {
+      throw new HttpException('Invite not found', HttpStatus.FORBIDDEN)
+    }
+
+    delete team.team_code
     return team
   }
 

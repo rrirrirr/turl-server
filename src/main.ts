@@ -10,7 +10,7 @@ async function bootstrap() {
   await app.get(MikroORM).getSchemaGenerator().ensureDatabase()
   await app.get(MikroORM).getSchemaGenerator().updateSchema()
   app.enableCors()
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }))
   useContainer(app.select(AppModule), { fallbackOnErrors: true })
   app.enableShutdownHooks()
   await app.listen(5001)
