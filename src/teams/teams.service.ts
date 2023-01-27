@@ -48,8 +48,6 @@ export class TeamsService {
     }
 
     if (foundInvite.tournament.id !== createTeamDto.tournament) {
-      console.log(foundInvite.tournament.id)
-      console.log(createTeamDto.tournament)
       throw new HttpException(
         'Invite not matching tournament',
         HttpStatus.FORBIDDEN
@@ -89,6 +87,7 @@ export class TeamsService {
 
   async update(id: string, updateTeamDto: UpdateTeamDto) {
     const team = await this.teamRepository.findOne({ id: id })
+
     if (!team) {
       throw new HttpException('Team not found', HttpStatus.NOT_FOUND)
     }

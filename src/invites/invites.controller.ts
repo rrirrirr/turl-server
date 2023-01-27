@@ -18,6 +18,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard'
 import { CheckAbilities } from 'src/abilities/abilities.decorator'
 import { Invite } from './entities/invite.entity'
 import { Action } from 'src/abilities/action.enum'
+import { QueryDto } from 'src/common/query.dto'
 
 @Controller('invites')
 export class InvitesController {
@@ -35,7 +36,7 @@ export class InvitesController {
   // @UseGuards(JwtAuthGuard, AbilitiesGuard)
   // @CheckAbilities({ action: Action.Read, subject: Invite })
   @Get()
-  findAll(@Query() query: any) {
+  findAll(@Query() query: QueryDto) {
     return this.invitesService.findAll(query)
   }
 
@@ -57,8 +58,8 @@ export class InvitesController {
     return this.invitesService.update(id, updateInviteDto, user)
   }
 
-  @UseGuards(JwtAuthGuard, AbilitiesGuard)
-  @CheckAbilities({ action: Action.Delete, subject: Invite })
+  @UseGuards(JwtAuthGuard)
+  // @CheckAbilities({ action: Action.Delete, subject: Invite })
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req: any) {
     const user = req.user

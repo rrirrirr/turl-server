@@ -14,6 +14,7 @@ import { Invite } from './entities/invite.entity'
 import { InjectRepository } from '@mikro-orm/nestjs'
 import { EntityRepository } from '@mikro-orm/sqlite'
 import { wrap, MikroORM } from '@mikro-orm/core'
+import { QueryDto } from 'src/common/query.dto'
 
 @Injectable()
 export class InvitesService {
@@ -24,10 +25,13 @@ export class InvitesService {
     private readonly tournamentAdminsService: TournamentAdminsService
   ) {}
 
-  async findAll(queries: CreateInviteDto): Promise<Invite[]> {
-    const invite = await this.inviteRepository.find(queries, {
-      populate: ['tournament'],
-    })
+  async findAll(queries: QueryDto): Promise<Invite[]> {
+    const invite = await this.inviteRepository.find(
+      { ...queries },
+      {
+        populate: ['tournament'],
+      }
+    )
     return invite
   }
 
@@ -69,6 +73,7 @@ export class InvitesService {
 
   async remove(id: string, user: AuthUser) {
     const invite = await this.inviteRepository.findOne({ id: id })
+    console.log('find it')
 
     if (!invite) {
       throw new HttpException('Invite not found', HttpStatus.NOT_FOUND)
@@ -87,11 +92,13 @@ export class InvitesService {
   private async getPermission(
     tournamentId: string,
     user: AuthUser
-  ): Promise<TournamentAdmin | null> {
+  ): Promise<boolean> {
     const adminRights = await this.tournamentAdminsService.findByTournamentId(
       tournamentId
     )
-    const permission = adminRights.find((right) => right.user === user.userId)
-    return permission
+    console.log(adminRights)
+    // const permission = adminRights.find((right) => right.user.find(() === user.userId))
+    return true
+    // return permission
   }
 }

@@ -1,5 +1,7 @@
 import {
+  Collection,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryKey,
@@ -13,6 +15,9 @@ import { v4 } from 'uuid'
 export class TournamentAdmin {
   @PrimaryKey()
   id: string = v4()
+
+  // @ManyToMany(() => User, 'tournamentAdmin', { owner: true })
+  // user = new Collection<User>(this)
 
   @ManyToOne(() => User)
   user: string

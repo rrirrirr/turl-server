@@ -32,6 +32,8 @@ export class TeamsController {
     return this.teamsService.create(createTeamDto, headers.invitecode || null)
   }
 
+  @UseGuards(JwtAuthGuard, AbilitiesGuard)
+  @CheckAbilities({ action: Action.Read, subject: Team })
   @Get()
   findAll(@Query() query: QueryDto) {
     return query?.team_code
@@ -39,20 +41,22 @@ export class TeamsController {
       : this.teamsService.findAll(query)
   }
 
+  @UseGuards(JwtAuthGuard, AbilitiesGuard)
+  @CheckAbilities({ action: Action.Read, subject: Team })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.teamsService.findOne(id)
   }
 
-  // @UseGuards(JwtAuthGuard, AbilitiesGuard)
-  // @CheckAbilities({ action: Action.Create, subject: Team })
+  @UseGuards(JwtAuthGuard, AbilitiesGuard)
+  @CheckAbilities({ action: Action.Update, subject: Team })
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTeamDto: UpdateTeamDto) {
     return this.teamsService.update(id, updateTeamDto)
   }
 
   @UseGuards(JwtAuthGuard, AbilitiesGuard)
-  @CheckAbilities({ action: Action.Create, subject: Team })
+  @CheckAbilities({ action: Action.Delete, subject: Team })
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.teamsService.remove(id)

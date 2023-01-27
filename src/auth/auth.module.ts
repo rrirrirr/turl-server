@@ -17,7 +17,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs'
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '60h' },
+      signOptions: { expiresIn: '10000h' },
     }),
   ],
   providers: [AuthService, LocalStrategy, UsersService, JwtStrategy],

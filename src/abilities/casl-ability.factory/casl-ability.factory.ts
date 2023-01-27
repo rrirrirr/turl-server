@@ -16,6 +16,7 @@ import { Venue } from 'src/venues/entities/venue.entity'
 import { Invite } from 'src/invites/entities/invite.entity'
 import { Game } from 'src/games/entities/game.entity'
 import { Team } from 'src/teams/entities/team.entity'
+import { AuthUser } from 'src/auth/authUser.entity'
 
 export type Subjects =
   | InferSubjects<
@@ -33,25 +34,38 @@ export type Subjects =
 
 export type AppAbility = Ability<[Action, Subjects]>
 
+interface UserCheck {
+  id: string
+  first_name: string
+  last_name: string
+  isAdmin: boolean
+  email: string
+  telephone_num?: string
+  created_at: Date
+  userAdmins: string[]
+}
+
 @Injectable()
 export class CaslAbilityFactory {
-  createForUser(user: User) {
+  createForUser(user: UserCheck) {
     const { can, cannot, build } = new AbilityBuilder<
       Ability<[Action, Subjects]>
     >(Ability as AbilityClass<AppAbility>)
 
     if (user.isAdmin) {
-      can(Action.Manage, 'all') // read-write access to everything
+      can(Action.Manage, 'all')
     } else {
-      can(Action.Read, 'all') // read-only access to everything
+      can(Action.Read, 'all')
+      can(Action.Create, Tournament)
+      can(Action.Create, Team)
     }
 
-    can(Action.Create, Tournament)
-    // can(Action.Update, Tournament, { authorId: user.id })
-    // can(Action.Delete, Tournament, { authorId: user.id })
+    // if (user.userAdmins?.length) {
+    //   can(Action.Manage, Tournament, { id: { $in: ['adminUsers'] } })
+    //   can(Action.Manage, Invite, { 'tournament.id': { $in: ['adminUsers'] } })
+    // }
 
     return build({
-      // Read https://casl.js.org/v5/en/guide/subject-type-detection#use-classes-as-subject-types for details
       detectSubjectType: (item) =>
         item.constructor as ExtractSubjectType<Subjects>,
     })
