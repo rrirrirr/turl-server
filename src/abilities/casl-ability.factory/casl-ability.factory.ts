@@ -58,11 +58,15 @@ export class CaslAbilityFactory {
       can(Action.Read, 'all')
       can(Action.Create, Tournament)
       can(Action.Create, Team)
+      can(Action.Update, Team)
+      can(Action.Delete, Game)
+      can(Action.Create, Game)
     }
 
     // if (user.userAdmins?.length) {
-    //   can(Action.Manage, Tournament, { id: { $in: ['adminUsers'] } })
-    //   can(Action.Manage, Invite, { 'tournament.id': { $in: ['adminUsers'] } })
+    // can(Action.Manage, Tournament, { id: { $in: ['adminUsers'] } })
+    // can(Action.Manage, Team, { 'team.tournament.id': { $in: ['adminUsers'] } })
+    // can(Action.Manage, Invite, { 'tournament.id': { $in: ['adminUsers'] } })
     // }
 
     return build({
