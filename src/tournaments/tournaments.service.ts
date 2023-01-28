@@ -81,7 +81,6 @@ export class TournamentsService {
     if (!permission && !user.isAdmin) {
       throw new ForbiddenException('No permission')
     }
-    console.log('find t')
     const tournament = await this.tournamentRepository.findOne(id)
 
     if (!tournament) {

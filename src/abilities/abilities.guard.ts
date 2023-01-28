@@ -38,12 +38,11 @@ export class AbilitiesGuard implements CanActivate {
       { populate: ['tournamentAdmin'] }
     )
 
-    console.log(user_)
-
     console.log('rules')
     console.log(rules)
     console.log('user')
-    console.log(user)
+    console.log(user_)
+    // console.log(user)
     const userWithAdminRights = {
       ...user_,
       userAdmins: user_.tournamentAdmin

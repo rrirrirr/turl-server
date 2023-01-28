@@ -73,7 +73,6 @@ export class InvitesService {
 
   async remove(id: string, user: AuthUser) {
     const invite = await this.inviteRepository.findOne({ id: id })
-    console.log('find it')
 
     if (!invite) {
       throw new HttpException('Invite not found', HttpStatus.NOT_FOUND)
@@ -96,7 +95,6 @@ export class InvitesService {
     const adminRights = await this.tournamentAdminsService.findByTournamentId(
       tournamentId
     )
-    console.log(adminRights)
     // const permission = adminRights.find((right) => right.user.find(() === user.userId))
     return true
     // return permission

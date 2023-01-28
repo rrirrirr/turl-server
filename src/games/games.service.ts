@@ -22,7 +22,6 @@ export class GamesService {
   }
 
   async create(createGameDto: CreateGameDto) {
-    console.log(createGameDto)
     const game = new Game()
     wrap(game).assign(createGameDto, { em: this.orm.em })
     await this.gameRepository.persistAndFlush(game)
